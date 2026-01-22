@@ -88,6 +88,8 @@ Frontend
 ## 📂 Project Structure
 
 Backend
+
+```text
 backend/
  ├── orders/
  ├── inventory/
@@ -97,14 +99,17 @@ backend/
  ├── events/
  ├── database/
  └── config/
-
+```
 Frontend
+
+```text
 frontend/
  ├── api/
  ├── pages/
  ├── components/
  ├── routes/
  └── types/
+```
 
 ## 🗄️ Database Schema (MariaDB)
 
