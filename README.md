@@ -225,6 +225,73 @@ Create .env file for frontend:
 VITE_API_BASE=http://localhost:3000
 ```
 
+## 🧪 Database Seeding (Auto-Seeded Products)
+
+This project automatically seeds the Products table with sample data when the application starts.
+
+### ✅ Why this is done
+
+- Allows immediate testing of order and inventory flows
+- No manual database setup required for evaluators
+
+### 🔄 How Seeding Works
+
+- On application startup, the app checks if the Products table already contains data
+- If products exist, seeding is skipped
+- If empty, sample products are inserted automatically
+
+### 📁 Seed File Location
+
+```text
+src/database/seed/seed-products.ts
+```
+
+### 🧩 Seed Logic (Simplified)
+```ts
+export async function seedProducts(dataSource: DataSource) {
+  const productRepo = dataSource.getRepository(Product);
+
+  const count = await productRepo.count();
+  if (count > 0) {
+    console.log('Products already seeded. Skipping...');
+    return;
+  }
+
+  await productRepo.save([
+    { name: 'Laptop', price: 50000, stockQuantity: 10 },
+    { name: 'Mouse', price: 1000, stockQuantity: 50 },
+    { name: 'Keyboard', price: 2000, stockQuantity: 30 },
+    { name: 'Monitor', price: 15000, stockQuantity: 20 },
+  ]);
+}
+```
+
+### 🚀 Application Startup Integration
+
+Seeding is triggered in main.ts during app bootstrap:
+
+```ts
+const dataSource = app.get(DataSource);
+await seedProducts(dataSource);
+```
+
+### 📦 Sample Seeded Products
+
+Product	Price	Stock
+Laptop	₹50,000	10
+Mouse	₹1,000	50
+Keyboard	₹2,000	30
+Monitor	₹15,000	20
+
+### 🔍 Verify Seeded Data
+
+After starting the application:
+```text
+GET http://localhost:3000/products
+```
+
+You should immediately see the seeded products.
+
 ## ✅ Key Design Decisions
 
 - No direct service-to-service calls
