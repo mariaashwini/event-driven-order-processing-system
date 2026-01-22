@@ -1,63 +1,63 @@
 # 📌 Event-Driven Order Processing System
 
-Built a simple **order processing system** that demonstrates proper use of **event-driven architecture** using NestJs event emitter.
+This project was developed as part of an **interview technical assignment**.
 
-ReactJS, Typescript and MySQL.
+The goal was to build a **simple but well-structured order processing system** that demonstrates a clear understanding of **event-driven architecture**, backend design, and basic frontend integration.
 
-The focus of this project is system design, data consistency, and service decoupling, rather than UI complexity.
+The focus of this project is **clean architecture and correct data flow**, not UI design.
 
-🎯 Objective of the Assignment
+📂 **GitHub Repo:** [https://github.com/mariaashwini/event-driven-order-processing-system](https://github.com/mariaashwini/event-driven-order-processing-system)
 
-Build an order processing workflow similar to real e-commerce systems
+## 🎯 Objective of the Assignment
 
-Implement event-driven communication between services
+- Implement an event-driven backend using NestJS
 
-Ensure data consistency using database transactions
+- Avoid direct service-to-service calls
 
-Demonstrate clear separation of responsibilities
+- Handle order lifecycle using events
 
-Provide a simple but functional frontend to consume APIs
+- Maintain proper separation between:
 
-✨ Key Features
-🔹 Backend (NestJS)
+     - Orders
 
-Create orders with multiple items
+     - Inventory
 
-Inventory validation and stock reservation
+     - Notifications
 
-Event-driven workflow using domain events
+     - Analytics
 
-Automatic order status transitions:
+- Provide a minimal React frontend to interact with the system
 
-PENDING → CONFIRMED
+## 🧠 High-Level Flow (How the System Works)
 
-PENDING → FAILED
+```md 
+1. A user creates an order from the frontend
 
-Notification service (simulated email logging)
+2. Order is saved in the database with PENDING status
 
-Analytics service (total orders & revenue)
+3. An OrderCreatedEvent is emitted
 
-Database-driven analytics refresh
+4. Inventory service listens to the event:
 
-DTO validation and error handling
+     - If stock is available → stock is reduced → InventoryReservedEvent
 
-Transaction-safe order creation
+     - If stock is not available → InventoryFailedEvent
 
-🔹 Frontend (React + TypeScript)
+5. Orders service listens to inventory events:
 
-View all orders
+     - Reserved → order becomes CONFIRMED
 
-View order details with item breakdown
+     - Failed → order becomes FAILED
 
-Create new orders
+6. Notifications service logs a simulated email message
 
-View analytics (total orders & revenue)
+7. Analytics service updates order statistics
+```
+All communication between services happens only via events.
 
-Clean API abstraction layer
+## 🏗️ Architecture Overview
 
-Minimal CSS (focus on logic & architecture)
-
-🧠 System Architecture (Event-Driven)
+```css
 Order Created
      │
      ▼
@@ -66,45 +66,27 @@ Inventory Service
      ├── Inventory Reserved ──► Order Confirmed ──► Notification + Analytics
      │
      └── Inventory Failed ────► Order Failed ─────► Notification
+```
+## 🛠️ Tech Stack
 
-Design Principles Applied
-
-Loose coupling between services
-
-Events trigger actions, not direct method calls
-
-Database as source of truth
-
-Analytics refreshed based on domain events
-
-🛠️ Tech Stack
 Backend
 
-Framework: NestJS
-
-Database: MySQL
-
-ORM: TypeORM
-
-Architecture: Event-Driven Architecture
-
-Validation: class-validator
-
-Events: @nestjs/event-emitter
+- NestJS
+- TypeScript
+- MariaDB
+- TypeORM
+- @nestjs/event-emitter
 
 Frontend
 
-Framework: React
+- React
+- TypeScript
+- React Router
+- Fetch API
+- Minimal CSS
 
-Language: TypeScript
+## 📂 Project Structure
 
-Routing: React Router
-
-API Handling: Fetch API
-
-Styling: Minimal CSS
-
-📂 Project Structure
 Backend
 backend/
  ├── orders/
@@ -124,86 +106,140 @@ frontend/
  ├── routes/
  └── types/
 
-🔌 API Endpoints
-Orders
+## 🗄️ Database Schema (MariaDB)
 
-POST /orders – Create a new order
+- products
 
-GET /orders – Get all orders
+- orders
 
-GET /orders/:id – Get order details
+- order_items
 
-Products
+Key design decisions:
 
-GET /products – List all products
+- Product price is copied to order_items.price_at_purchase
 
-Analytics
+- Client-sent prices are not trusted
 
-GET /analytics/data – Get total orders & total revenue
+- Order total is calculated on the backend
 
-⚙️ Analytics Design Decision
+## 🔌 REST APIs Implemented
 
-Analytics service listens to order confirmation events
+**Orders**
 
-Events trigger analytics refresh
+- POST /orders – Create a new order
+- GET /orders – List all orders
+- GET /orders/:id – Get order details
 
-Analytics data is recalculated from the database
+**Products**
 
-In-memory storage is used only as a cache
+- GET /products – List all products
 
-Ensures accuracy and consistency, even after restarts
+**Analytics**
 
-⚡ Installation & Setup
-1️⃣ Clone Repository
+- GET /analytics/data – Get total orders & total revenue
+
+## 📊 Analytics Design
+
+- Analytics service listens for OrderConfirmedEvent
+
+- On each event, analytics are recalculated from the database
+
+- In-memory variables are used only as a cache
+
+- This ensures correctness even after server restarts
+
+## 🖥️ Frontend Pages
+
+```md
+1. Create Order Page
+     - Customer details
+     - Product selection
+     - Quantity input
+     - Live total calculation
+2. Orders List Page
+     - Order ID
+     - Customer name
+     - Total amount
+     - Status
+     - Created date
+3. Order Detail Page
+     - Order information
+     - Items list
+     - Current status
+4. Analytics Page
+     - Total orders count
+     - Total revenue
+```
+
+UI is intentionally simple to keep focus on logic.
+
+## ⚙️ Setup Instructions
+Follow these steps to run the project locally:
+
+```bash
+# 1. Clone the repository
 git clone https://github.com/mariaashwini/event-driven-order-processing-system.git
-cd event-driven-order-processing-system
 
-2️⃣ Backend Setup
+# 2. Navigate into the project folder
+cd order-processing-system
+```
+
+**Backend**
+
+```bash
 cd backend
 npm install
 npm run start
+```
 
+Create .env file for backend:
 
-Create .env file:
+```bash
+# App
+PORT=3000
 
+# Database (MariaDB)
 DB_HOST=localhost
-DB_PORT=3306
+DB_PORT=3307
 DB_USERNAME=root
-DB_PASSWORD=yourpassword
+DB_PASSWORD=admin@07
 DB_NAME=order_processing_system
+```
+Ensure MariaDB is running.
 
-3️⃣ Frontend Setup
+**Frontend**
+
+```bash
 cd frontend
 npm install
 npm run dev
+```
+Create .env file for frontend:
 
-🧪 Key Technical Highlights
+```bash
+VITE_API_BASE=http://localhost:3000
+```
 
-Orders are created inside database transactions
+## ✅ Key Design Decisions
 
-Product prices are not trusted from the client
+- No direct service-to-service calls
 
-Inventory checks happen asynchronously via events
+- All cross-service communication via events
 
-Analytics data is derived from persisted data
+- Backend does not trust client-sent prices
 
-Clear separation between:
+- Transactions used for order creation
 
-Domain logic
+- Analytics derived from persisted data
 
-Infrastructure
+## 🧪 What Can Be Tested
 
-Presentation layer
+- Order with sufficient stock → CONFIRMED
 
-👩‍💻 Developer Notes
+- Order with insufficient stock → FAILED
 
-This project was designed to demonstrate backend architecture and system thinking, rather than UI polish.
-All major decisions are intentional and align with real-world backend practices.
+- Inventory stock decreases correctly
 
-👤 Author
+- Notification logs appear in console
 
-Maria Ashwini
-Full-Stack Developer
-React | NestJS | MySQL
-
-GitHub: https://github.com/mariaashwini
+- Analytics updates after confirmed orders
