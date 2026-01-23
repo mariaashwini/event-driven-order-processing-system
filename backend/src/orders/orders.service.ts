@@ -100,9 +100,9 @@ export class OrdersService {
     // 8. Emit OrderCreatedEvent
     this.eventEmitter.emit(EVENTS.ORDER_CREATED, {
       orderId: savedOrder.id,
-      customerEmail: savedOrder.customerEmail,
+      // customerEmail: savedOrder.customerEmail,
       items: eventItems,
-      totalAmount: calculatedTotal,
+      // totalAmount: calculatedTotal,
     });
 
     return savedOrder;
@@ -110,18 +110,28 @@ export class OrdersService {
 }
 
   @OnEvent(EVENTS.INVENTORY_RESERVED)
-  async handleInventoryReserved(event: InventoryReservedEvent) {
-    // Update order to CONFIRMED
-    // Emit OrderConfirmedEvent
-    const { orderId } = event;
+async handleInventoryReserved(event: InventoryReservedEvent) {
+  const { orderId } = event;
 
-    // 1. Find order
+  try {
+    // 1. Fetch order
     const order = await this.orderRepo.findOne({
       where: { id: orderId },
     });
 
+    // Safety check (event may be delayed or duplicated)
     if (!order) {
-      // Safety check (event might be delayed)
+      this.logger.warn(
+        `Order not found for INVENTORY_RESERVED event. orderId=${orderId}`,
+      );
+      return;
+    }
+
+    // Idempotency check
+    if (order.status === OrderStatus.CONFIRMED) {
+      this.logger.warn(
+        `Order ${orderId} already CONFIRMED. Skipping duplicate event.`,
+      );
       return;
     }
 
@@ -129,30 +139,45 @@ export class OrdersService {
     order.status = OrderStatus.CONFIRMED;
     await this.orderRepo.save(order);
 
-    this.logger.log(
-      `Order confirmed for order ${event.orderId}`,
-    );
+    this.logger.log(`Order confirmed for orderId=${orderId}`);
 
-    // 3. Emit OrderConfirmed event
+    // 3. Emit next event
     this.eventEmitter.emit(EVENTS.ORDER_CONFIRMED, {
       orderId: order.id,
       customerEmail: order.customerEmail,
-      totalAmount: order.totalAmount
+      totalAmount: order.totalAmount,
     });
+  } catch (error) {
+    this.logger.error(
+      `Error handling INVENTORY_RESERVED for orderId=${orderId}`,
+      error.stack,
+    );
   }
+}
 
-  @OnEvent(EVENTS.INVENTORY_FAILED)
-  async handleInventoryFailed(event: InventoryFailedEvent) {
-    // Update order to FAILED
-    // Emit OrderFailedEvent
-    const { orderId, reason } = event;
 
-    // 1. Find order
+ @OnEvent(EVENTS.INVENTORY_FAILED)
+async handleInventoryFailed(event: InventoryFailedEvent) {
+  const { orderId, reason } = event;
+
+  try {
+    // 1. Fetch order
     const order = await this.orderRepo.findOne({
       where: { id: orderId },
     });
 
     if (!order) {
+      this.logger.warn(
+        `Order not found for INVENTORY_FAILED event. orderId=${orderId}`,
+      );
+      return;
+    }
+
+    // Idempotency check
+    if (order.status === OrderStatus.FAILED) {
+      this.logger.warn(
+        `Order ${orderId} already FAILED. Skipping duplicate event.`,
+      );
       return;
     }
 
@@ -160,17 +185,22 @@ export class OrdersService {
     order.status = OrderStatus.FAILED;
     await this.orderRepo.save(order);
 
-    this.logger.log(
-      `Order Failed for order ${event.orderId}`,
-    );
+    this.logger.log(`Order failed for orderId=${orderId}`);
 
-    // 3. Emit OrderFailed event
+    // 3. Emit failure event
     this.eventEmitter.emit(EVENTS.ORDER_FAILED, {
       orderId: order.id,
       customerEmail: order.customerEmail,
       reason,
     });
+  } catch (error) {
+    this.logger.error(
+      `Error handling INVENTORY_FAILED for orderId=${orderId}`,
+      error.stack,
+    );
   }
+}
+
 
   async findAll(): Promise<Order[]> {
     return this.orderRepo.find();

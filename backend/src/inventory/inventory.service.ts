@@ -4,43 +4,52 @@ import { DataSource } from 'typeorm';
 
 import { Product } from '../database/entities/product.entity';
 import { EVENTS } from '../common/constants/event-names';
-
 import { OrderCreatedEvent } from '../events/order.events';
+
+class InsufficientStockError extends Error {
+  constructor(public productId: number) {
+    super(`Insufficient stock for product ${productId}`);
+  }
+}
 
 @Injectable()
 export class InventoryService {
-   private readonly logger = new Logger(InventoryService.name);
+  private readonly logger = new Logger(InventoryService.name);
 
   constructor(
     private readonly dataSource: DataSource,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-
-   @OnEvent(EVENTS.ORDER_CREATED)
+  @OnEvent(EVENTS.ORDER_CREATED)
   async handleOrderCreated(event: OrderCreatedEvent) {
-    // 1. Check stock for all items
-    // 2. If sufficient: reduce stock, emit InventoryReservedEvent
-    // 3. If insufficient: emit InventoryFailedEvent
- this.logger.log(`Inventory check started for order ${event.orderId}`);
+    const orderId = event.orderId;
+
+    this.logger.log(
+      `[ORDER ${orderId}] START inventory check`,
+    );
 
     try {
       await this.dataSource.transaction(async (manager) => {
-        //  Check stock for ALL items
+        this.logger.log(
+          `[ORDER ${orderId}] CHECK validating stock`,
+        );
+
         for (const item of event.items) {
           const product = await manager.findOne(Product, {
             where: { id: item.productId },
-            lock: { mode: 'pessimistic_write' }, // prevent race conditions
+            lock: { mode: 'pessimistic_write' },
           });
 
           if (!product || product.stockQuantity < item.quantity) {
-            throw new Error(
-              `Insufficient stock for product ${item.productId}`,
-            );
+            throw new InsufficientStockError(item.productId);
           }
         }
 
-        //  Reduce stock (only if all checks passed)
+        this.logger.log(
+          `[ORDER ${orderId}] UPDATE reducing stock`,
+        );
+
         for (const item of event.items) {
           await manager.decrement(
             Product,
@@ -51,23 +60,35 @@ export class InventoryService {
         }
       });
 
-      //  Emit inventory reserved (AFTER commit)
-      this.logger.log(`Inventory reserved for order ${event.orderId}`);
+      this.logger.log(
+        `[ORDER ${orderId}] SUCCESS inventory reserved`,
+      );
 
       this.eventEmitter.emit(EVENTS.INVENTORY_RESERVED, {
-        orderId: event.orderId,
+        orderId,
       });
+
+      this.logger.log(
+        `[ORDER ${orderId}] EMIT INVENTORY_RESERVED`,
+      );
     } catch (error) {
-      // 4️⃣ Emit inventory failed
+      const reason =
+        error instanceof InsufficientStockError
+          ? `INSUFFICIENT_STOCK (product ${error.productId})`
+          : 'INVENTORY_SERVICE_ERROR';
+
       this.logger.error(
-        `Inventory failed for order ${event.orderId}`,
-        error.message,
+        `[ORDER ${orderId}] FAIL inventory check → ${reason}`,
       );
 
       this.eventEmitter.emit(EVENTS.INVENTORY_FAILED, {
-        orderId: event.orderId,
-        reason: error.message,
+        orderId,
+        reason,
       });
+
+      this.logger.log(
+        `[ORDER ${orderId}] EMIT INVENTORY_FAILED`,
+      );
     }
   }
 }

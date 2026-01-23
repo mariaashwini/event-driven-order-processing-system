@@ -1,13 +1,13 @@
-// Example structure (you implement)
+//Order related events
 
 export class OrderCreatedEvent {
   orderId: number;
-  customerEmail: string;
+  // customerEmail: string;
   items: Array<{
     productId: number;
     quantity: number;
   }>;
-  totalAmount: number;
+  // totalAmount: number;
 }
 
 export class OrderConfirmedEvent {

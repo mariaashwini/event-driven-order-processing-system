@@ -23,12 +23,22 @@ export class AnalyticsService {
    * Recalculate analytics when order is confirmed
    */
   @OnEvent(EVENTS.ORDER_CONFIRMED)
-  async handleOrderConfirmedEvent() {
+async handleOrderConfirmedEvent() {
+  try {
+    // Refresh analytics metrics
     await this.refreshAnalytics();
+
+    //  Log success with metrics
     this.logger.log(
       `Analytics updated → orders=${this.totalOrders}, revenue=${this.totalRevenue}`,
     );
+  } catch (error) {
+    //  Log failure 
+    this.logger.error(
+      `Failed to update analytics: ${error.message}`,
+    );
   }
+}
 
   /**
    * Read analytics from DB
