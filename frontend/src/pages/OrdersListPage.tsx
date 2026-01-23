@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { getOrders } from "../api/orders.api";
 import StatusBadge from "../components/StatusBadge";
 import type { Order } from "../types/order";
 
-/*  COMPONENT  */
-
 export default function OrdersListPage() {
+  const location = useLocation();
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -14,6 +14,7 @@ export default function OrdersListPage() {
   useEffect(() => {
     const loadOrders = async () => {
       try {
+        setLoading(true);
         const data = await getOrders();
         setOrders(data);
       } catch (err: any) {
@@ -24,7 +25,7 @@ export default function OrdersListPage() {
     };
 
     loadOrders();
-  }, []);
+  }, [location.key]); // 🔥 FIX
 
   if (loading) return <p className="text-center">Loading orders...</p>;
   if (error) return <p className="text-error">{error}</p>;
