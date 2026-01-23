@@ -32,6 +32,16 @@ export async function seedProducts(dataSource: DataSource) {
       price: 15000,
       stockQuantity: 20,
     },
+    {
+      name: 'Headphones',
+      price: 1000,
+      stockQuantity: 0,
+    },
+    {
+      name: 'CPU',
+      price: 10000,
+      stockQuantity: 20,
+    },
   ];
 
   await productRepo.save(products);
