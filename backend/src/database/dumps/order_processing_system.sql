@@ -1,0 +1,187 @@
+/*M!999999\- enable the sandbox mode */ 
+-- MariaDB dump 10.19-12.1.2-MariaDB, for Win64 (AMD64)
+--
+-- Host: localhost    Database: order_processing_system
+-- ------------------------------------------------------
+-- Server version	12.1.2-MariaDB
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*M!100616 SET @OLD_NOTE_VERBOSITY=@@NOTE_VERBOSITY, NOTE_VERBOSITY=0 */;
+
+--
+-- Table structure for table `order_items`
+--
+
+DROP TABLE IF EXISTS `order_items`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `order_items` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `order_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `price_at_purchase` decimal(10,2) NOT NULL,
+  `created_at` timestamp(6) NOT NULL DEFAULT current_timestamp(6),
+  PRIMARY KEY (`id`),
+  KEY `FK_145532db85752b29c57d2b7b1f1` (`order_id`),
+  KEY `FK_9263386c35b6b242540f9493b00` (`product_id`),
+  CONSTRAINT `FK_145532db85752b29c57d2b7b1f1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `FK_9263386c35b6b242540f9493b00` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `order_items`
+--
+
+LOCK TABLES `order_items` WRITE;
+/*!40000 ALTER TABLE `order_items` DISABLE KEYS */;
+set autocommit=0;
+INSERT INTO `order_items` VALUES
+(1,1,1,1,50000.00,'2026-01-19 11:52:29.056103'),
+(2,1,2,2,1000.00,'2026-01-19 11:52:29.097221'),
+(3,2,3,1,2000.00,'2026-01-19 15:48:57.977157'),
+(4,2,4,4,15000.00,'2026-01-19 15:48:57.996739'),
+(5,3,4,5,15000.00,'2026-01-19 16:18:58.516689'),
+(6,3,2,4,1000.00,'2026-01-19 16:18:58.532640'),
+(7,4,4,20,15000.00,'2026-01-19 16:23:56.080155'),
+(8,4,2,4,1000.00,'2026-01-19 16:23:56.091000'),
+(9,5,1,3,50000.00,'2026-01-19 17:05:32.737238'),
+(10,5,2,2,1000.00,'2026-01-19 17:05:32.748127'),
+(11,6,1,10,50000.00,'2026-01-19 17:07:33.236630'),
+(12,6,2,2,1000.00,'2026-01-19 17:07:33.246601'),
+(13,7,1,2,50000.00,'2026-01-20 07:05:42.768728'),
+(14,7,2,2,1000.00,'2026-01-20 07:05:42.786682'),
+(15,8,2,2,1000.00,'2026-01-20 07:07:58.259242'),
+(16,8,1,7,50000.00,'2026-01-20 07:07:58.269921'),
+(17,9,2,2,1000.00,'2026-01-20 08:02:17.932491'),
+(18,10,4,5,15000.00,'2026-01-20 08:08:41.022026'),
+(19,11,4,7,15000.00,'2026-01-20 08:17:18.462288'),
+(20,12,2,4,1000.00,'2026-01-20 08:21:54.376804'),
+(21,13,2,5,1000.00,'2026-01-20 08:25:52.766887'),
+(22,14,3,5,2000.00,'2026-01-20 08:28:49.698032'),
+(23,15,2,3,1000.00,'2026-01-20 08:31:45.956819'),
+(24,16,2,2,1000.00,'2026-01-20 14:48:47.454083'),
+(25,16,3,3,2000.00,'2026-01-20 14:48:47.482340'),
+(26,17,1,2,50000.00,'2026-01-21 07:17:22.199943'),
+(27,17,3,3,2000.00,'2026-01-21 07:17:22.212975'),
+(28,18,3,2,2000.00,'2026-01-21 07:51:36.347677'),
+(29,18,2,4,1000.00,'2026-01-21 07:51:36.374911'),
+(30,19,2,3,1000.00,'2026-01-23 11:10:47.944564'),
+(31,19,3,2,2000.00,'2026-01-23 11:10:47.954664'),
+(32,20,4,4,15000.00,'2026-01-23 11:14:46.665723'),
+(33,20,2,1,1000.00,'2026-01-23 11:14:46.669989'),
+(34,21,4,2,15000.00,'2026-01-23 11:27:11.078380'),
+(35,21,3,1,2000.00,'2026-01-23 11:27:11.127986'),
+(36,22,4,1,15000.00,'2026-01-23 11:43:11.904234');
+/*!40000 ALTER TABLE `order_items` ENABLE KEYS */;
+UNLOCK TABLES;
+commit;
+
+--
+-- Table structure for table `orders`
+--
+
+DROP TABLE IF EXISTS `orders`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `orders` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `customer_name` varchar(255) NOT NULL,
+  `customer_email` varchar(255) NOT NULL,
+  `total_amount` decimal(10,2) NOT NULL,
+  `status` enum('PENDING','CONFIRMED','COMPLETED','FAILED') NOT NULL DEFAULT 'PENDING',
+  `created_at` timestamp(6) NOT NULL DEFAULT current_timestamp(6),
+  `updated_at` timestamp(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `orders`
+--
+
+LOCK TABLES `orders` WRITE;
+/*!40000 ALTER TABLE `orders` DISABLE KEYS */;
+set autocommit=0;
+INSERT INTO `orders` VALUES
+(1,'Maria Ashwini','maria@gmail.com',52000.00,'COMPLETED','2026-01-19 11:52:28.952110','2026-01-20 15:11:26.561240'),
+(2,'Emica','emica@gmail.com',62000.00,'PENDING','2026-01-19 15:48:57.903249','2026-01-19 15:48:57.903249'),
+(3,'Anu','anu@gmail.com',79000.00,'PENDING','2026-01-19 16:18:58.475012','2026-01-19 16:18:58.475012'),
+(4,'Ria','ria@gmail.com',304000.00,'PENDING','2026-01-19 16:23:56.068180','2026-01-19 16:23:56.068180'),
+(5,'Sai','sai@gmail.com',152000.00,'CONFIRMED','2026-01-19 17:05:32.694763','2026-01-19 17:05:32.000000'),
+(6,'abc','abc@gmail.com',502000.00,'FAILED','2026-01-19 17:07:33.223014','2026-01-19 17:07:33.000000'),
+(7,'Mia','mia@gmail.com',102000.00,'CONFIRMED','2026-01-20 07:05:42.698965','2026-01-20 07:05:43.000000'),
+(8,'lee','lee@gmail.com',352000.00,'FAILED','2026-01-20 07:07:58.246860','2026-01-20 07:07:58.000000'),
+(9,'ram','ram@gmail.com',2000.00,'CONFIRMED','2026-01-20 08:02:17.885214','2026-01-20 08:02:18.000000'),
+(10,'sam','sam@gmail.com',75000.00,'CONFIRMED','2026-01-20 08:08:40.986560','2026-01-20 08:08:41.000000'),
+(11,'tom','tom@gmail.com',105000.00,'CONFIRMED','2026-01-20 08:17:18.421734','2026-01-20 08:17:18.000000'),
+(12,'jim','jim@gmail.com',4000.00,'CONFIRMED','2026-01-20 08:21:54.357246','2026-01-20 08:21:54.000000'),
+(13,'roy','roy@gmail.com',5000.00,'CONFIRMED','2026-01-20 08:25:52.752539','2026-01-20 08:25:52.000000'),
+(14,'Liya','liya@gmail.com',10000.00,'CONFIRMED','2026-01-20 08:28:49.669024','2026-01-20 08:28:49.000000'),
+(15,'somu','somu@gmail.com',3000.00,'CONFIRMED','2026-01-20 08:31:45.946940','2026-01-20 08:31:46.000000'),
+(16,'kala','kala@gmail.com',8000.00,'CONFIRMED','2026-01-20 14:48:47.394088','2026-01-20 14:48:47.000000'),
+(17,'Achu','achu@gmail.com',106000.00,'CONFIRMED','2026-01-21 07:17:22.142510','2026-01-21 07:17:22.000000'),
+(18,'Mala','mala@gmail.com',8000.00,'CONFIRMED','2026-01-21 07:51:36.259247','2026-01-21 07:51:36.000000'),
+(19,'rai','rai@gmail.com',7000.00,'CONFIRMED','2026-01-23 11:10:47.888080','2026-01-23 11:10:48.000000'),
+(20,'sia','sia@gmail.com',61000.00,'FAILED','2026-01-23 11:14:46.659600','2026-01-23 11:14:46.000000'),
+(21,'mani','mani@gmail.com',32000.00,'CONFIRMED','2026-01-23 11:27:11.052543','2026-01-23 11:27:11.000000'),
+(22,'kavya','javya@gmail.com',15000.00,'CONFIRMED','2026-01-23 11:43:11.889476','2026-01-23 11:43:12.000000');
+/*!40000 ALTER TABLE `orders` ENABLE KEYS */;
+UNLOCK TABLES;
+commit;
+
+--
+-- Table structure for table `products`
+--
+
+DROP TABLE IF EXISTS `products`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `products` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `stock_quantity` int(11) NOT NULL,
+  `created_at` timestamp(6) NOT NULL DEFAULT current_timestamp(6),
+  `updated_at` timestamp(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `products`
+--
+
+LOCK TABLES `products` WRITE;
+/*!40000 ALTER TABLE `products` DISABLE KEYS */;
+set autocommit=0;
+INSERT INTO `products` VALUES
+(1,'Laptop',50000.00,10,'2026-01-18 14:32:18.430641','2026-01-23 11:46:48.112979'),
+(2,'Mouse',1000.00,50,'2026-01-18 14:32:18.477143','2026-01-23 11:47:04.644573'),
+(3,'Keyboard',2000.00,30,'2026-01-18 14:32:18.488559','2026-01-23 11:47:19.598656'),
+(4,'Monitor',15000.00,20,'2026-01-18 14:32:18.499271','2026-01-23 11:47:33.324568'),
+(5,'Headphones',1000.00,0,'2026-01-23 11:52:18.323190','2026-01-23 11:52:18.323190'),
+(6,'CPU',10000.00,20,'2026-01-23 11:53:32.268567','2026-01-23 11:53:32.268567');
+/*!40000 ALTER TABLE `products` ENABLE KEYS */;
+UNLOCK TABLES;
+commit;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
+
+-- Dump completed on 2026-01-23 17:38:25
