@@ -186,7 +186,7 @@ Follow these steps to run the project locally:
 git clone https://github.com/mariaashwini/event-driven-order-processing-system.git
 
 # 2. Navigate into the project folder
-cd order-processing-system
+cd event-driven-order-processing-system
 ```
 
 **Backend**
@@ -262,6 +262,8 @@ export async function seedProducts(dataSource: DataSource) {
     { name: 'Mouse', price: 1000, stockQuantity: 50 },
     { name: 'Keyboard', price: 2000, stockQuantity: 30 },
     { name: 'Monitor', price: 15000, stockQuantity: 20 },
+    { name: 'Headphones', price: 1000, stockQuantity: 0 },
+    { name: 'CPU', price: 10000, stockQuantity: 20 },
   ]);
 }
 ```
